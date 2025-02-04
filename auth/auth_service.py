@@ -8,15 +8,15 @@ from functools import wraps
 from flasgger import Swagger
 
 app = Flask(__name__)
-swagger = Swagger(app)  # Inicializar Swagger
+swagger = Swagger(app)  # Initialiser Swagger
 
-# Configuración de Redis
+# Configuration Redis
 redis_client = Redis(host=os.getenv("REDIS_HOST", "localhost"), port=int(os.getenv("REDIS_PORT", 6379)), decode_responses=True)
 
-# Clave secreta para JWT
-SECRET_KEY = os.getenv("SECRET_KEY", "mi_super_secreto")
+# Clee secret pour JWT
+SECRET_KEY = os.getenv("SECRET_KEY", "secret")
 
-# Cargar usuarios desde el archivo CSV
+# Charger les utilisateurs à partir du fichier CSV
 def load_users_from_csv():
     if redis_client.scard("users") == 0:
         with open("initial_data_users.csv", mode="r", encoding="utf-8") as file:
@@ -30,7 +30,7 @@ def load_users_from_csv():
 
 load_users_from_csv()
 
-# Decorador para validar tokens JWT
+# Décorateur pour vérifier le token JWT
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -46,6 +46,18 @@ def token_required(f):
             return jsonify({"error": "Token invalide"}), 401
         return f(*args, **kwargs)
     return decorated
+
+
+@app.route('/', methods=['GET'])
+def get_home():
+    """
+    Page d'accueil de l'API.
+    ---
+    responses:
+      200:
+        description: Page d'accueil
+    """
+    return jsonify({"message": "Bienvenue sur l'API d'authentification"}), 200
 
 @app.route('/login', methods=['POST'])
 def login():

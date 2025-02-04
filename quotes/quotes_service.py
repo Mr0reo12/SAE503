@@ -4,10 +4,22 @@ import os
 from flasgger import Swagger
 
 app = Flask(__name__)
-swagger = Swagger(app)  # Inicializar Swagger
+swagger = Swagger(app)  # Initialiser Swagger
 
-# Configuración de Redis
+# Configuration Redis
 redis_client = Redis(host=os.getenv("REDIS_HOST", "localhost"), port=int(os.getenv("REDIS_PORT", 6379)), decode_responses=True)
+
+
+@app.route('/', methods=['GET'])
+def get_home():
+    """
+    Page d'accueil de l'API.
+    ---
+    responses:
+      200:
+        description: Page d'accueil
+    """
+    return jsonify({"message": "Bienvenue sur l'API de citations"}), 200
 
 @app.route('/quotes', methods=['GET'])
 def get_quotes():
@@ -50,6 +62,6 @@ def search_quotes():
         if keyword.lower() in redis_client.hget(quote, "quote").lower()
     ]
     return jsonify(filtered_quotes), 200
-
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)

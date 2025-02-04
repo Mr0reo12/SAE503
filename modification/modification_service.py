@@ -4,10 +4,23 @@ import os
 from flasgger import Swagger
 
 app = Flask(__name__)
-swagger = Swagger(app)  # Inicializar Swagger
+swagger = Swagger(app)  # Initialiser Swagger
 
-# Configuración de Redis
+# Configuration Redis
 redis_client = Redis(host=os.getenv("REDIS_HOST", "localhost"), port=int(os.getenv("REDIS_PORT", 6379)), decode_responses=True)
+
+
+
+@app.route('/', methods=['GET'])
+def get_home():
+    """
+    Page d'accueil de l'API.
+    ---
+    responses:
+      200:
+        description: Page d'accueil
+    """
+    return jsonify({"message": "Bienvenue sur l'API de modification"}), 200
 
 @app.route('/quotes', methods=['POST'])
 def add_quote():
